@@ -33,34 +33,6 @@ O app permite escolher uma tonalidade maior, selecionar o tipo de tétrade e toc
 
 Quando uma fundamental é indicada com grafia enarmônica inadequada para a tonalidade, o app considera a equivalência sonora e realiza a análise com a grafia mais apropriada ao contexto tonal.
 
-## Como publicar no GitHub Pages
-
-1. Crie um repositório no GitHub.
-2. Envie o arquivo HTML para o repositório.
-3. Opcionalmente, renomeie o arquivo HTML para `index.html`.
-4. No GitHub, acesse **Settings > Pages**.
-5. Em **Build and deployment**, selecione a branch principal e a pasta raiz.
-6. Salve a configuração.
-7. O GitHub Pages disponibilizará o app em uma URL pública.
-
-## Estrutura recomendada do repositório
-
-```text
-/
-├── index.html
-└── README.md
-```
-
-Caso prefira manter o nome original do arquivo HTML, a estrutura pode ser:
-
-```text
-/
-├── analisador_de_tetrades_v11.html
-└── README.md
-```
-
-Nesse caso, o acesso será feito diretamente pelo nome do arquivo HTML dentro da URL do GitHub Pages.
-
 ## Requisitos
 
 O app funciona diretamente no navegador e não precisa de instalação.
