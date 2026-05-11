@@ -88,6 +88,49 @@ img,svg,canvas,table{max-width:100%}
   .footer-note{font-size:.72rem}
 }
 
+
+/* Ajustes v13: celular sem overflow e piano realmente inteiro */
+html,body{max-width:100%;overflow-x:hidden}
+.app,.shell,.content,.mainGrid,.setupCard,.analysisCard,.pianoWrap{max-width:100%;min-width:0}
+.content{overflow:hidden}
+.pianoWrap{overflow:hidden}
+.piano{box-sizing:border-box;width:min(760px,100%);max-width:100%;min-width:0;grid-template-columns:repeat(7,minmax(0,1fr))}
+.key{min-width:0}
+.analysisCard{overflow:hidden}
+.analysisCard .scrollbox{width:100%;max-width:100%;overflow-x:hidden;padding-right:0}
+.analysisCard .table{width:100%;min-width:0!important;max-width:100%;table-layout:fixed}
+.table th,.table td{white-space:normal;overflow-wrap:anywhere;word-break:normal}
+@media(max-width:640px){
+  .app{display:block;width:100%;padding:0;overflow-x:hidden}
+  .shell{width:100%;max-width:100%;overflow:hidden}
+  .content{width:100%;padding:8px;overflow:hidden}
+  .topbar{width:100%;padding:10px;overflow:hidden}
+  .toolbar{grid-template-columns:1fr 1fr 1fr;min-width:0}
+  .toolbar button{min-width:0;white-space:normal;line-height:1.05}
+  .card{width:100%;padding:10px;border-radius:16px;overflow:hidden}
+  .topSelectors{grid-template-columns:1fr;gap:8px}
+  .typeGrid{grid-template-columns:repeat(5,minmax(0,1fr));gap:4px;width:100%}
+  .typeBtn{font-size:clamp(.62rem,2.7vw,.78rem);padding:8px 1px;border-radius:10px;letter-spacing:-.02em}
+  .pianoWrap{padding:8px 3px 6px;width:100%;overflow:hidden;border-radius:16px}
+  .piano{width:100%;max-width:100%;height:clamp(88px,28vw,118px);gap:1px;margin:0;overflow:visible}
+  .white{height:100%;padding-bottom:6px;font-size:clamp(.56rem,2.45vw,.72rem);border-radius:0 0 7px 7px}
+  .black{width:9.1%;height:58%;padding-bottom:4px;font-size:clamp(.48rem,2vw,.62rem);border-radius:0 0 6px 6px;line-height:1}
+  .black[data-i="0"]{left:9.9%}.black[data-i="1"]{left:24.2%}.black[data-i="2"]{left:52.8%}.black[data-i="3"]{left:67.1%}.black[data-i="4"]{left:81.4%}
+  .footer-note{font-size:.68rem;line-height:1.25;margin:6px 2px 0}
+  .analysisCard .scrollbox{overflow-x:hidden;max-height:none}
+  .analysisCard .table,.analysisCard .table thead,.analysisCard .table tbody,.analysisCard .table tr,.analysisCard .table td{display:block;width:100%;max-width:100%}
+  .analysisCard .table thead{display:none}
+  .analysisCard .table tr{border:1px solid var(--line);border-radius:12px;margin:0 0 8px;background:rgba(255,255,255,.035);overflow:hidden}
+  .analysisCard .table td{border-bottom:1px solid var(--line);padding:7px 8px 7px 42%;font-size:.78rem;line-height:1.28;position:relative;min-height:32px}
+  .analysisCard .table td:last-child{border-bottom:0}
+  .analysisCard .table td::before{content:attr(data-label);position:absolute;left:8px;top:7px;width:35%;font-weight:900;color:var(--muted);font-family:Inter,system-ui,-apple-system,Segoe UI,Roboto,Arial,sans-serif;overflow-wrap:normal;word-break:normal}
+  .h2{font-size:1.02rem}.intro{font-size:.86rem;line-height:1.35}.field select{min-height:40px;font-size:.92rem}
+  .appFooter{font-size:.74rem;line-height:1.3;padding:10px 8px;overflow-wrap:anywhere}
+}
+@media(max-width:390px){
+  .content{padding:6px}.card{padding:8px}.typeBtn{font-size:.58rem;padding:7px 0}.piano{height:84px}.black{font-size:.46rem}.white{font-size:.52rem}.analysisCard .table td{font-size:.74rem;padding-left:39%}.analysisCard .table td::before{width:32%}
+}
+
 </style>
 </head>
 <body>
@@ -215,7 +258,7 @@ function renderInterpretations(rows){
     const obs=[r.notacao?`<b>Notação:</b> ${esc(r.notacao)}`:'', r.comentario?esc(r.comentario):''].filter(Boolean).join('<br>');
     const prepares=String(r.origem||'').includes('prepara/relaciona-se');
     const func=r.funcao ? (prepares ? `(${r.funcao})` : r.funcao) : '';
-    return `<tr><td>${esc(func)}</td><td class="mono">${esc(r.grau||'')}</td><td>${esc(r.origem||'')}</td><td>${obs}</td></tr>`;
+    return `<tr><td data-label="Função">${esc(func)}</td><td data-label="Grau" class="mono">${esc(r.grau||'')}</td><td data-label="Referência / origem">${esc(r.origem||'')}</td><td data-label="Observação">${obs}</td></tr>`;
   }).join('')}</tbody></table></div>`;
 }
 function analysisPanel(titleHtml, bodyHtml){
