@@ -4,7 +4,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>Analisador de Acordes Tonais v3</title>
+<title>Analisador de Acordes Tonais v4</title>
 <style>
 :root{--bg:#0b1020;--panel:#141c2f;--panel2:#0f1728;--text:#f7f9ff;--muted:#b6c2d9;--line:#2a3650;--accent:#8bd8ff;--accent2:#b7f3c6;--warn:#ffd98d;--bad:#ffaaaa;--radius:24px;--shadow:0 24px 80px rgba(0,0,0,.42)}
 *{box-sizing:border-box}html,body{min-height:100%;margin:0;font-family:Inter,system-ui,-apple-system,Segoe UI,Roboto,Arial,sans-serif;background:radial-gradient(circle at top left,#1e365b 0,#0b1020 44%,#060912 100%);color:var(--text)}
@@ -49,8 +49,8 @@ button,select{font:inherit}button{border:0;border-radius:16px;padding:12px 16px;
     <div class="modalHead"><h2 id="modalTitle" style="margin:0">Explanação do software</h2><button style="margin-left:auto" class="ghost small" onclick="closeHelp()">Fechar</button></div>
     <div class="modalBody explainGrid text">
       <section class="card"><h3>Apresentação</h3><p>Este software identifica o grau de um acorde em relação a uma tonalidade, consulta uma base harmônica derivada das planilhas originais e apresenta funções tonais, campo harmônico/modal, prioridades e possíveis leituras secundárias.</p><p>A aplicação não envia dados para a internet e não depende de bibliotecas externas.</p></section>
-      <section class="card"><h3>Nomenclatura utilizada</h3><p><b>Graus:</b> a análise usa graus cromáticos em relação ao tom: I, #I, bII, II, #II, bIII, III, IV, #IV, bV, V, #V, bVI, VI, #VI, bVII e VII.</p><p><b>Funções:</b> T = tônica, S = subdominante e D = dominante. Quando a base não atribui função principal, o acorde pode ser interpretado por leituras secundárias ou pode estar fora da notação prevista.</p><p><b>C.H.M.</b> significa campo harmônico/modal ou origem conceitual indicada na planilha.</p><p><b>Prioridade:</b> número usado pela base para hierarquizar explicações. Quanto menor o valor, mais prioritária é a leitura.</p><p><b>Enarmonia:</b> C# e Db podem soar iguais, mas são tratados como grafias diferentes porque, na análise tonal, a notação altera o grau e a interpretação.</p><p><b>Leituras secundárias:</b> são explicações como dominantes secundárias, subdominantes secundárias, empréstimos modais e preparações para outros graus.</p></section>
-      <section class="card"><h3>Modo de usar</h3><p>Escolha uma armadura de clave. Em modo maior, a primeira tonalidade do par é usada. Em modo menor, a segunda tonalidade do par é usada e a busca de graus é feita por seu relativo maior, preservando a armadura.</p><p>Selecione o tipo de acorde e toque a fundamental no teclado. O aplicativo monta a cifra internamente e procura a fundamental no mapa de graus da tonalidade.</p><p>O resultado mostra a função principal, quando existir, e uma tabela com possíveis funções secundárias. Use os comentários para decidir se a explicação se aplica ao contexto musical real.</p><p>Para acordes cuja grafia não aparece no mapa da tonalidade, tente uma enarmonia.</p></section>
+      <section class="card"><h3>Nomenclatura utilizada</h3><p><b>Graus:</b> a análise usa graus cromáticos em relação ao tom: I, #I, bII, II, #II, bIII, III, IV, #IV, bV, V, #V, bVI, VI, #VI, bVII e VII.</p><p><b>Funções:</b> T = tônica, S = subdominante e D = dominante. Quando a base não atribui função principal, o acorde pode ser interpretado por leituras secundárias ou pode estar fora da notação prevista.</p><p><b>C.H.M.</b> significa campo harmônico/modal ou origem conceitual indicada na planilha.</p><p><b>Enarmonia:</b> C# e Db podem soar iguais, mas são tratados como grafias diferentes porque, na análise tonal, a notação altera o grau e a interpretação.</p><p><b>Leituras secundárias:</b> são explicações como dominantes secundárias, subdominantes secundárias, empréstimos modais e preparações para outros graus.</p></section>
+      <section class="card"><h3>Modo de usar</h3><p>Escolha uma armadura de clave. Em modo maior, a primeira tonalidade do par é usada. Em modo menor, a segunda tonalidade do par é usada e a busca de graus é feita por seu relativo maior, preservando a armadura.</p><p>Selecione o tipo de acorde e toque a fundamental no teclado. O aplicativo monta a cifra internamente e procura a fundamental no mapa de graus da tonalidade.</p><p>O resultado mostra as possíveis interpretações disponíveis na base, já ordenadas internamente. Leituras sem informação registrada são omitidas para que a primeira interpretação exibida seja sempre a primeira opção efetivamente disponível.</p><p>Para acordes cuja grafia não aparece no mapa da tonalidade, tente uma enarmonia.</p></section>
       <section class="card"><h3>Limitações conceituais e de aplicação</h3><p>Esta ferramenta não substitui análise musical contextual. Ela classifica acordes isolados a partir de uma tonalidade indicada e de uma base de regras.</p><p>Modulações, tonicizações prolongadas, ambiguidades formais, baixo real, inversões, condução de vozes, melodia e posição métrica não são avaliados automaticamente.</p><p>Peças modais, atonais, politonais ou com harmonia funcionalmente ambígua podem gerar resultados incompletos.</p><p>A base enviada é especialmente detalhada para tétrades em tonalidades maiores. Tríades e 7sus4 são tratados por adaptação conservadora das famílias correspondentes, com aviso no resultado.</p></section>
     </div>
   </div>
@@ -93,6 +93,41 @@ function enharmonicNotice(info,tipo){
 function findEntry(grau,tipo){const spec=typeMap[tipo]||{base:tipo};return DATA.entries.find(e=>e.grau===grau&&String(e.tipo)===String(spec.base))}
 function adaptText(txt,tipo){if(!txt)return txt; if(tipo==='M')return String(txt).replace(/Maj7/g,'').replace(/\(\s*\)/g,''); if(tipo==='m')return String(txt).replace(/m7\(b5\)/g,'m7(b5)').replace(/m7/g,'m'); if(tipo==='dim')return String(txt).replace(/dim7/g,'dim'); if(tipo==='7sus4')return String(txt).replace(/7/g,'7sus4'); return txt}
 function funcLabel(f){return f?`<span class="pill func">${esc(f)}</span>`:'<span class="pill">não indicada</span>'}
+function hasInterpretation(x){return !!(x && (x.grau||x.funcao||x.referencia||x.chm||x.notacao||x.comentario))}
+function buildInterpretations(entry,tipo){
+  const rows=[];
+  if(hasInterpretation(entry) && (entry.funcao||entry.chm||entry.notacao||entry.comentario)){
+    rows.push({
+      ordem: entry.prioridade ?? 999,
+      grau: adaptText(entry.grau,tipo),
+      funcao: entry.funcao||'',
+      origem: adaptText(entry.chm,tipo)||'',
+      notacao: entry.notacao||'',
+      comentario: adaptText(entry.comentario,tipo)||''
+    });
+  }
+  for(const s of (entry.secundarias||[])){
+    if(!hasInterpretation(s)) continue;
+    rows.push({
+      ordem: s.prioridade ?? 999,
+      grau: adaptText(s.grau,tipo),
+      funcao: s.funcao||'',
+      origem: s.referencia?`prepara/relaciona-se a ${s.referencia}`:'',
+      notacao: s.notacao||'',
+      comentario: adaptText(s.comentario,tipo)||''
+    });
+  }
+  return rows
+    .filter(r=>r.grau||r.funcao||r.origem||r.notacao||r.comentario)
+    .sort((a,b)=>(a.ordem-b.ordem));
+}
+function renderInterpretations(rows){
+  if(!rows.length) return '<p class="text">Não há interpretações registradas para esta entrada.</p>';
+  return `<div class="scrollbox"><table class="table"><thead><tr><th>Grau</th><th>Função</th><th>Referência / origem</th><th>Observações</th></tr></thead><tbody>${rows.map((r,i)=>{
+    const obs=[r.notacao?`<b>Notação:</b> ${esc(r.notacao)}`:'', r.comentario?esc(r.comentario):''].filter(Boolean).join('<br>');
+    return `<tr><td class="mono">${esc(r.grau||'')}</td><td>${esc(r.funcao||'')}</td><td>${esc(r.origem||'')}</td><td>${obs}</td></tr>`;
+  }).join('')}</tbody></table></div>`;
+}
 function esc(v){return String(v??'').replace(/[&<>"']/g,m=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[m]))}
 function analyze(play=true){
   refreshActive();
@@ -110,12 +145,13 @@ function analyze(play=true){
     compact.innerHTML=`<b>${esc(cifra)}</b>${info.isEnharmonic?` ≈ <b>${esc(cifraAnalise)}</b>`:''}: grau ${esc(grau)}, tipo não encontrado na base.`;
     return;
   }
-  let secs=[...(entry.secundarias||[])].filter(s=>s.grau||s.funcao||s.referencia||s.comentario).sort((a,b)=>(a.prioridade??99)-(b.prioridade??99));
+  let interpretations=buildInterpretations(entry,tipo);
+  let first=interpretations[0]||{};
   let modeWarn=ctx.mode==='minor'?`<div class="notice warn">Modo menor: a armadura foi interpretada por seu relativo maior (${esc(ctx.baseMajor)} maior). Confirme a análise no contexto da tonalidade menor real.</div>`:'';
   let derived=spec.derived?`<div class="notice warn">${esc(spec.note)}</div>`:'';
   let displayTitle=info.isEnharmonic?`${cifra} → ${cifraAnalise}`:cifra;
-  compact.innerHTML=`<p><b>${esc(displayTitle)}</b> em <b>${esc(ctx.tonic)} ${ctx.mode==='major'?'maior':'menor'}</b></p><p>Grau: <b>${esc(grau)}</b> · Função: ${entry.funcao?`<b>${esc(entry.funcao)}</b>`:'não indicada'} · C.H.M.: ${esc(adaptText(entry.chm,tipo)||'não indicado')}</p>`;
-  out.innerHTML=`<div class="result"><div class="card"><h3 class="h2">${esc(displayTitle)}</h3><p><span class="pill">Tom: ${esc(ctx.tonic)} ${ctx.mode==='major'?'maior':'menor'}</span><span class="pill">Grau: <b>${esc(grau)}</b></span><span class="pill">Tipo-base: ${esc(entry.tipo)}</span></p>${enhNotice}${modeWarn}${derived}<h3>Análise principal</h3><p>${funcLabel(entry.funcao)}</p><p><b>C.H.M.:</b> ${esc(adaptText(entry.chm,tipo)||'não indicado')}</p><p><b>Prioridade:</b> ${esc(entry.prioridade||'não indicada')}</p>${entry.notacao?`<p class="warn"><b>Notação:</b> ${esc(entry.notacao)}</p>`:''}${entry.comentario?`<p class="text"><b>Comentário:</b> ${esc(adaptText(entry.comentario,tipo))}</p>`:''}</div><div class="card"><h3>Interpretações secundárias</h3>${secs.length?`<div class="scrollbox"><table class="table"><thead><tr><th>Grau</th><th>Função</th><th>Ref.</th><th>Prior.</th><th>Comentário</th></tr></thead><tbody>${secs.map(s=>`<tr><td class="mono">${esc(adaptText(s.grau,tipo))}${s.notacao?`<br><small>${esc(s.notacao)}</small>`:''}</td><td>${esc(s.funcao||'')}</td><td>${esc(s.referencia||'')}</td><td>${esc(s.prioridade||'')}</td><td>${esc(adaptText(s.comentario,tipo)||'')}</td></tr>`).join('')}</tbody></table></div>`:'<p class="text">Não há leituras secundárias registradas para esta entrada.</p>'}</div></div>`
+  compact.innerHTML=`<p><b>${esc(displayTitle)}</b> em <b>${esc(ctx.tonic)} ${ctx.mode==='major'?'maior':'menor'}</b></p><p>Grau do acorde: <b>${esc(grau)}</b>${first.funcao?` · Função: <b>${esc(first.funcao)}</b>`:''}${first.origem?` · ${esc(first.origem)}`:''}</p>`;
+  out.innerHTML=`<div class="result"><div class="card"><h3 class="h2">${esc(displayTitle)}</h3><p><span class="pill">Tom: ${esc(ctx.tonic)} ${ctx.mode==='major'?'maior':'menor'}</span><span class="pill">Grau do acorde: <b>${esc(grau)}</b></span><span class="pill">Tipo-base: ${esc(entry.tipo)}</span></p>${enhNotice}${modeWarn}${derived}</div><div class="card"><h3>Possíveis interpretações</h3>${renderInterpretations(interpretations)}</div></div>`
 }
 function getAudio(){if(!audioCtx)audioCtx=new (window.AudioContext||window.webkitAudioContext)(); if(audioCtx.state==='suspended')audioCtx.resume(); return audioCtx}
 const pcMap={C:0,'C#':1,Db:1,D:2,'D#':3,Eb:3,E:4,F:5,'F#':6,Gb:6,G:7,'G#':8,Ab:8,A:9,'A#':10,Bb:10,B:11};
