@@ -44,6 +44,50 @@ body.light .table td{border-bottom-color:#b9c5c1}
 body.light .notice{background:rgba(47,125,148,.10);color:#2b3a48}
 body.light .appFooter{background:rgba(214,224,221,.72)}
 
+
+/* Ajustes v12: responsividade móvel e piano sempre visível */
+html,body{width:100%;overflow-x:hidden}
+img,svg,canvas,table{max-width:100%}
+.shell{max-width:100vw}
+.pianoWrap{width:100%;overflow:visible;padding:clamp(10px,3vw,18px) clamp(6px,2vw,12px) 8px}
+.piano{width:100%;max-width:760px;min-width:0;height:clamp(132px,42vw,210px);gap:clamp(1px,.45vw,2px);touch-action:manipulation}
+.white{height:100%;border-radius:0 0 clamp(8px,2.5vw,14px) clamp(8px,2.5vw,14px);padding-bottom:clamp(8px,2.4vw,16px);font-size:clamp(.72rem,2.8vw,1rem)}
+.black{width:10.2%;height:61%;border-radius:0 0 clamp(7px,2vw,12px) clamp(7px,2vw,12px);padding-bottom:clamp(6px,1.8vw,12px);font-size:clamp(.62rem,2.35vw,.92rem)}
+.typeGrid{grid-template-columns:repeat(5,minmax(0,1fr))}
+.typeBtn{min-width:0;white-space:nowrap}
+.scrollbox{overflow-x:auto;-webkit-overflow-scrolling:touch}
+.analysisCard .table{min-width:640px}
+@media(max-width:640px){
+  .app{padding:0}
+  .shell{border-radius:0;border-left:0;border-right:0;min-height:100vh}
+  .topbar{align-items:flex-start;gap:10px;padding:12px;flex-wrap:wrap}
+  .brand{font-size:1rem;line-height:1.2;max-width:calc(100vw - 24px)}
+  .toolbar{width:100%;margin-left:0;display:grid;grid-template-columns:1fr 1fr 1fr;gap:6px}
+  .toolbar button{width:100%;padding:9px 6px;font-size:.82rem;border-radius:12px}
+  .content{padding:10px;gap:10px}
+  .card{padding:12px;border-radius:18px}
+  .setupCard{gap:10px}
+  .intro{font-size:.92rem;margin-bottom:4px}
+  .field label{font-size:.9rem}
+  .field select{min-height:44px;padding:10px 12px;border-radius:13px}
+  .h2{font-size:1.12rem;margin-bottom:9px}
+  .typeGrid{grid-template-columns:repeat(5,minmax(0,1fr));gap:5px;margin:4px 0 10px}
+  .typeBtn{padding:9px 2px;font-size:.78rem;border-radius:11px}
+  .piano{height:clamp(126px,38vw,165px)}
+  .black[data-i="0"]{left:9.5%}.black[data-i="1"]{left:23.7%}.black[data-i="2"]{left:52.2%}.black[data-i="3"]{left:66.5%}.black[data-i="4"]{left:80.8%}
+  .footer-note{font-size:.76rem;margin:8px 2px 0}
+  .analysisCard .table{min-width:560px}
+  .table th,.table td{padding:8px;font-size:.86rem}
+  .appFooter{padding:12px;font-size:.82rem}
+}
+@media(max-width:380px){
+  .typeBtn{font-size:.72rem;padding:8px 1px}
+  .piano{height:122px}
+  .black{font-size:.56rem}
+  .white{font-size:.68rem}
+  .footer-note{font-size:.72rem}
+}
+
 </style>
 </head>
 <body>
