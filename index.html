@@ -1,4 +1,5 @@
 
+
 <!doctype html>
 <html lang="pt-BR">
 <head>
@@ -131,6 +132,25 @@ html,body{max-width:100%;overflow-x:hidden}
   .content{padding:6px}.card{padding:8px}.typeBtn{font-size:.58rem;padding:7px 0}.piano{height:84px}.black{font-size:.46rem}.white{font-size:.52rem}.analysisCard .table td{font-size:.74rem;padding-left:39%}.analysisCard .table td::before{width:32%}
 }
 
+
+/* Aprimoramento v14: nomes das funções e teclado de referência */
+.funcName{font-size:.82rem;color:var(--muted);font-weight:800;margin-left:4px;white-space:nowrap}
+.funcCombo{display:inline-flex;align-items:center;gap:4px;flex-wrap:wrap}
+.refBtn{display:inline-flex;align-items:center;gap:6px;border:1px solid rgba(139,216,255,.55);background:rgba(139,216,255,.12);color:var(--text);border-radius:999px;padding:6px 10px;margin:2px 4px 2px 0;font-weight:900;cursor:pointer}
+.refBtn:hover{background:rgba(139,216,255,.22)}
+.refBtn::before{content:'';display:inline-block;width:18px;height:3px;border-radius:999px;background:var(--accent)}
+.refHint{display:block;margin-top:4px;color:var(--muted);font-size:.82rem}
+.refKeyboardPanel{width:min(1080px,100%)}
+.refKeyboardMeta{display:flex;flex-wrap:wrap;gap:8px;margin-bottom:14px}
+.refKeyboard{position:relative;width:100%;height:230px;margin:12px auto 6px;display:grid;grid-template-columns:repeat(14,minmax(0,1fr));gap:1px}
+.refKeyboard .white{height:230px;font-size:.8rem;padding-bottom:10px}
+.refKeyboard .black{width:3.9%;height:140px;font-size:.68rem;padding-bottom:7px}
+.refKeyboard .refActive{box-shadow:inset 0 -12px 0 rgba(112,224,184,.78),0 0 0 2px rgba(112,224,184,.32)}
+.refKeyboard .rootMark::after{content:'◆';position:absolute;top:8px;left:50%;transform:translateX(-50%);color:var(--accent);font-size:.75rem}
+.refKeyboardNote{font-size:.92rem;color:var(--muted);line-height:1.45;margin-top:10px}
+body.light .refBtn{background:rgba(47,125,148,.12);border-color:rgba(47,125,148,.45)}
+@media(max-width:640px){.funcName{display:block;margin-left:0;margin-top:2px}.refKeyboard{height:142px;grid-template-columns:repeat(14,minmax(0,1fr))}.refKeyboard .white{height:142px;font-size:.5rem;padding-bottom:5px}.refKeyboard .black{height:86px;font-size:.44rem;padding-bottom:3px}.refKeyboardMeta .pill{font-size:.74rem}.refBtn{padding:5px 7px;font-size:.76rem}.refHint{font-size:.72rem}}
+
 </style>
 </head>
 <body>
@@ -178,11 +198,19 @@ html,body{max-width:100%;overflow-x:hidden}
     <div class="modalBody text">
       <div class="explainText">
         <p>Este software identifica o grau de um acorde em relação a uma tonalidade, consulta uma base harmônica derivada das planilhas originais e apresenta funções tonais, campo harmônico/modal e possíveis leituras secundárias. A aplicação não envia dados para a internet e não depende de bibliotecas externas.</p>
-        <p>A análise usa graus cromáticos em relação ao tom: I, #I, bII, II, #II, bIII, III, IV, #IV, bV, V, #V, bVI, VI, #VI, bVII e VII. As funções indicadas são T = tônica, S = subdominante e D = dominante. Quando a base não atribui função principal, o acorde pode ser interpretado por leituras secundárias ou pode estar fora da notação prevista. C.H.M. significa campo harmônico/modal ou origem conceitual indicada na planilha.</p>
+        <p>A análise usa graus cromáticos em relação ao tom: I, #I, bII, II, #II, bIII, III, IV, #IV, bV, V, #V, bVI, VI, #VI, bVII e VII. As funções indicadas são T = Tônica, S = Subdominante, D = Dominante; entre parênteses aparecem as leituras secundárias, como (D) = Dominante secundária e (S) = Subdominante secundária. Quando a base não atribui função principal, o acorde pode ser interpretado por leituras secundárias ou pode estar fora da notação prevista. C.H.M. significa campo harmônico/modal ou origem conceitual indicada na planilha.</p>
         <p>C# e Db podem soar iguais, mas são tratados como grafias diferentes porque, na análise tonal, a notação altera o grau e a interpretação. As leituras secundárias incluem explicações como dominantes secundárias, subdominantes secundárias, empréstimos modais e preparações para outros graus.</p>
         <p>Para usar, escolha a tonalidade maior, selecione o tipo de acorde e toque a fundamental no teclado. O aplicativo monta a cifra internamente e procura a fundamental no mapa de graus da tonalidade. O resultado mostra as possíveis interpretações disponíveis na base. Leituras sem informação registrada são omitidas para que a primeira interpretação exibida seja sempre a primeira opção efetivamente disponível. Para acordes cuja grafia não aparece no mapa da tonalidade, tente uma enarmonia.</p>
         <p>Esta ferramenta não substitui análise musical contextual. Ela classifica acordes isolados a partir de uma tonalidade indicada e de uma base de regras. Modulações, tonicizações prolongadas, ambiguidades formais, baixo real, inversões, condução de vozes, melodia e posição métrica não são avaliados automaticamente. Peças modais, atonais, politonais ou com harmonia funcionalmente ambígua podem gerar resultados incompletos. A base enviada é detalhada para as tétrades selecionadas no aplicativo, sempre considerando tonalidades maiores.</p>
       </div>
+    </div>
+  </div>
+</div>
+<div class="modal" id="refModal" role="dialog" aria-modal="true" aria-labelledby="refModalTitle">
+  <div class="modalPanel refKeyboardPanel">
+    <div class="modalHead"><h2 id="refModalTitle" style="margin:0">Teclado de referência</h2><button style="margin-left:auto" class="ghost small" onclick="closeRefKeyboard()">Fechar</button></div>
+    <div class="modalBody text">
+      <div id="refKeyboardContent"></div>
     </div>
   </div>
 </div>
@@ -226,7 +254,15 @@ function enharmonicNotice(info,tipo){
 }
 function findEntry(grau,tipo){const spec=typeMap[tipo]||{base:tipo};return DATA.entries.find(e=>e.grau===grau&&String(e.tipo)===String(spec.base))}
 function adaptText(txt,tipo){return txt}
-function funcLabel(f){return f?`<span class="pill func">${esc(f)}</span>`:'<span class="pill">não indicada</span>'}
+const functionNames={T:'Tônica',D:'Dominante',S:'Subdominante',DimAuxA:'Diminuto auxiliar A',DimAuxB:'Diminuto auxiliar B'};
+function functionFullName(f){const clean=String(f||'').replace(/[()]/g,'');return functionNames[clean]||clean}
+function formatFunction(f,isSecondary=false){
+  if(!f)return '<span class="pill">não indicada</span>';
+  const letter=isSecondary?`(${f})`:f;
+  const name=isSecondary?`${functionFullName(f)} secundária`:functionFullName(f);
+  return `<span class="funcCombo"><span class="pill func">${esc(letter)}</span><span class="funcName">${esc(name)}</span></span>`;
+}
+function funcLabel(f){return formatFunction(f,false)}
 function hasInterpretation(x){return !!(x && (x.grau||x.funcao||x.referencia||x.chm||x.notacao||x.comentario))}
 function buildInterpretations(entry,tipo){
   const rows=[];
@@ -236,6 +272,8 @@ function buildInterpretations(entry,tipo){
       grau: adaptText(entry.grau,tipo),
       funcao: entry.funcao||'',
       origem: adaptText(entry.chm,tipo)||'',
+      referencia: '',
+      isSecondary: false,
       notacao: entry.notacao||'',
       comentario: adaptText(entry.comentario,tipo)||''
     });
@@ -247,6 +285,8 @@ function buildInterpretations(entry,tipo){
       grau: adaptText(s.grau,tipo),
       funcao: s.funcao||'',
       origem: s.referencia?`prepara/relaciona-se a ${s.referencia}`:'',
+      referencia: s.referencia||'',
+      isSecondary: !!s.referencia,
       notacao: s.notacao||'',
       comentario: adaptText(s.comentario,tipo)||''
     });
@@ -259,11 +299,101 @@ function renderInterpretations(rows){
   if(!rows.length) return '<p class="text">Não há interpretações registradas para esta entrada.</p>';
   return `<div class="scrollbox"><table class="table"><thead><tr><th>Função</th><th>Grau</th><th>Referência / origem</th><th>Observação</th></tr></thead><tbody>${rows.map((r)=>{
     const obs=[r.notacao?`<b>Notação:</b> ${esc(r.notacao)}`:'', r.comentario?esc(r.comentario):''].filter(Boolean).join('<br>');
-    const prepares=String(r.origem||'').includes('prepara/relaciona-se');
-    const func=r.funcao ? (prepares ? `(${r.funcao})` : r.funcao) : '';
-    return `<tr><td data-label="Função">${esc(func)}</td><td data-label="Grau" class="mono">${esc(r.grau||'')}</td><td data-label="Referência / origem">${esc(r.origem||'')}</td><td data-label="Observação">${obs}</td></tr>`;
+    const func=formatFunction(r.funcao,r.isSecondary);
+    const refHtml=referenceHtml(r);
+    return `<tr><td data-label="Função">${func}</td><td data-label="Grau" class="mono">${esc(r.grau||'')}</td><td data-label="Referência / origem">${refHtml}</td><td data-label="Observação">${obs}</td></tr>`;
   }).join('')}</tbody></table></div>`;
 }
+function referenceHtml(r){
+  if(r.referencia){
+    const ctx=selectedContext();
+    const root=degreeNote(ctx.baseMajor,r.referencia)||r.referencia;
+    return `<button class="refBtn" type="button" onclick="openRefKeyboard('${escAttr(r.referencia)}','${escAttr(r.funcao||'')}')">${esc(r.referencia)} — ${esc(root)}</button><span class="refHint">prepara/relaciona-se a este grau; clique para abrir o teclado</span>`;
+  }
+  return esc(r.origem||'');
+}
+function escAttr(v){return esc(v).replace(/`/g,'&#96;')}
+function degreeNote(baseMajor,degree){
+  const row=DATA.majorKeys.find(k=>k.key===baseMajor);
+  return row&&row.degrees ? row.degrees[degree] : '';
+}
+const diatonicRefTypes={I:'Maj7',II:'m7',III:'m7',IV:'Maj7',V:'7',VI:'m7',VII:'m7(b5)'};
+function cleanDegreeForQuality(degree){return String(degree||'').replace(/^[#b]+/,'')}
+function suggestedRefType(degree,funcao){
+  const clean=cleanDegreeForQuality(degree);
+  if(diatonicRefTypes[clean])return diatonicRefTypes[clean];
+  if(funcao==='D')return '7';
+  if(funcao==='S')return 'Maj7';
+  return 'Maj7';
+}
+function chordNotes(root,type){
+  const intervals=(typeMap[type]?.intervals)||typeMap.Maj7.intervals;
+  const rootPc=pc(root);
+  return intervals.map(iv=>(rootPc+iv)%12);
+}
+const pcToPt=['Dó','Dó#','Ré','Mib','Mi','Fá','Fá#','Sol','Láb','Lá','Sib','Si'];
+function closedChordMidi(root,type){
+  const intervals=(typeMap[type]?.intervals)||typeMap.Maj7.intervals;
+  const rootPc=pc(root);
+  const base=60+rootPc;
+  return intervals.map(iv=>base+iv);
+}
+function midiPc(midi){return ((midi%12)+12)%12}
+function midiFreq(midi){return 440*Math.pow(2,(midi-69)/12)}
+function openRefKeyboard(degree,funcao){
+  const ctx=selectedContext();
+  const root=degreeNote(ctx.baseMajor,degree);
+  if(!root)return;
+  const tipo=suggestedRefType(degree,funcao);
+  const chordMidi=closedChordMidi(root,tipo);
+  renderRefKeyboard({degree,root,tipo,chordMidi,ctx});
+  document.getElementById('refModal').classList.add('open');
+  playSpecificChord(root,tipo);
+}
+function closeRefKeyboard(){document.getElementById('refModal').classList.remove('open')}
+function renderRefKeyboard({degree,root,tipo,chordMidi,ctx}){
+  const content=document.getElementById('refKeyboardContent');
+  const title=`${root}${tipo==='M'?'':tipo}`;
+  const noteNames=chordMidi.map(m=>pcToPt[midiPc(m)]).join(' — ');
+  content.innerHTML=`<div class="refKeyboardMeta"><span class="pill func">${esc(degree)}</span><span class="pill">${esc(title)}</span><span class="pill">${esc(noteNames)}</span><span class="pill">${esc(ctx.tonic)} ${esc(ctx.modeLabel)}</span><button class="primary small" type="button" onclick="playSpecificChord('${escAttr(root)}','${escAttr(tipo)}')">Tocar acorde</button></div><div class="refKeyboard" id="refKeyboard"></div><p class="refKeyboardNote">O teclado mostra somente o acorde em posição fechada, uma vez. O losango marca a fundamental.</p>`;
+  buildRefKeyboard(root,chordMidi);
+}
+function buildRefKeyboard(root,chordMidi){
+  const el=document.getElementById('refKeyboard');
+  const whiteSeq=['C','D','E','F','G','A','B'];
+  const blackInfo=[['C#','Db',0],['D#','Eb',1],['F#','Gb',3],['G#','Ab',4],['A#','Bb',5]];
+  const activeMidi=new Set(chordMidi);
+  const rootMidi=chordMidi[0];
+  el.innerHTML='';
+  for(let oct=4;oct<=5;oct++){
+    whiteSeq.forEach(n=>{
+      const midi=12*(oct+1)+pc(n);
+      const b=document.createElement('button');
+      b.type='button';b.className='key white';b.textContent=n+oct;b.dataset.note=n;
+      b.onclick=()=>playFreq(midiFreq(midi),getAudio().currentTime+0.01,.75,.055);
+      if(activeMidi.has(midi))b.classList.add('refActive');
+      if(midi===rootMidi)b.classList.add('rootMark');
+      el.appendChild(b);
+    });
+  }
+  for(let oct=4;oct<=5;oct++){
+    blackInfo.forEach(([sharp,flat,whiteIndex])=>{
+      const midi=12*(oct+1)+pc(sharp);
+      const b=document.createElement('button');
+      b.type='button';b.className='key black';b.textContent=sharp+'/'+flat;b.dataset.note=sharp;
+      const octaveOffset=(oct-4)*7;const left=((octaveOffset+whiteIndex+0.68)/14)*100;b.style.left=left+'%';
+      b.onclick=()=>playFreq(midiFreq(midi),getAudio().currentTime+0.01,.75,.055);
+      if(activeMidi.has(midi))b.classList.add('refActive');
+      if(midi===rootMidi)b.classList.add('rootMark');
+      el.appendChild(b);
+    });
+  }
+}
+function playSpecificChord(root,type){
+  const ac=getAudio(), start=ac.currentTime+0.015;
+  closedChordMidi(root,type).forEach((midi,i)=>playFreq(midiFreq(midi),start+i*0.045,1.25,0.055));
+}
+
 function analysisPanel(titleHtml, bodyHtml){
   document.getElementById('compactResult').innerHTML=bodyHtml;
   document.getElementById('results').innerHTML='';
@@ -300,7 +430,7 @@ function toggleTheme(){const next=document.body.classList.contains('light')?'dar
 function openHelp(){document.getElementById('modal').classList.add('open')}
 function closeHelp(){document.getElementById('modal').classList.remove('open')}
 function exitApp(){try{window.close()}catch(e){}document.body.innerHTML='<div class="app"><div class="card"><h1>Aplicativo encerrado.</h1><p class="text">Você pode fechar esta aba do navegador.</p></div></div>'}
-document.addEventListener('keydown',e=>{if(e.key==='Escape')closeHelp()});
+document.addEventListener('keydown',e=>{if(e.key==='Escape'){closeHelp();closeRefKeyboard()}});
 init();
 </script>
 </body></html>
